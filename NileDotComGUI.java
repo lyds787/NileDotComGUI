@@ -2,8 +2,15 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.nio.file.*;
+import java.util.ArrayList;
+
 
 public class NileDotComGUI {
+    
+static ArrayList<String> cart = new ArrayList<>();
+static int itemCount = 0;
+static double orderSubtotal = 0.0;
+
 
     public static void main(String[] args) {
 
@@ -18,6 +25,9 @@ public class NileDotComGUI {
         JTextField qtyField = new JTextField(15);
 
         JButton searchButton = new JButton("Search");
+        
+        JButton addButton = new JButton("Add To Cart");
+addButton.setEnabled(false);
 
 
 searchButton.addActionListener(e -> {
@@ -55,7 +65,7 @@ searchButton.addActionListener(e -> {
                             "Error",
                             JOptionPane.ERROR_MESSAGE);
                     return;
-                }
+                } 
 
                 if (qty > stockQty) {
                     JOptionPane.showMessageDialog(frame,
@@ -80,6 +90,8 @@ JOptionPane.showMessageDialog(frame,
         "Line Subtotal: $" + String.format("%.2f", lineSubtotal),
         "Nile Dot Com",
         JOptionPane.INFORMATION_MESSAGE);
+                
+                addButton.setEnabled(true);
 return;
 
             }
@@ -100,6 +112,41 @@ return;
     }
 });
 
+        addButton.addActionListener(e -> {
+
+    if (itemCount == 5) {
+        JOptionPane.showMessageDialog(frame,
+                "Cart is full (5 items max)",
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    double discountRate = getDiscountRate(qty);
+    double lineSubtotal = qty * price * (1.0 - discountRate);
+
+    itemCount++;
+    orderSubtotal += lineSubtotal;
+
+    String cartLine =
+            itemCount + ". " +
+            itemId + " | " +
+            description + " | " +
+            "Qty: " + qty + " | " +
+            "Price: $" + price + " | " +
+            "Disc: " + (int)(discountRate * 100) + "% | " +
+            "Total: $" + String.format("%.2f", lineSubtotal);
+
+    cart.add(cartLine);
+
+    JOptionPane.showMessageDialog(frame,
+            "Item added to cart.\nCurrent subtotal: $" +
+            String.format("%.2f", orderSubtotal));
+
+    addButton.setEnabled(false);
+});
+
+
 
         frame.setLayout(new FlowLayout());
         frame.add(idLabel);
@@ -107,6 +154,7 @@ return;
         frame.add(qtyLabel);
         frame.add(qtyField);
         frame.add(searchButton);
+        frame.add(addButton);
 
         frame.setVisible(true);
     }
