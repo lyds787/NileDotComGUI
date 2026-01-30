@@ -259,6 +259,7 @@ public class NileDotComGUI {
                 for (String line : cart) {
                     out.println(transactionId + "," + timestamp + "," + line );
                 }
+                out.println("\n");
 
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(frame,
