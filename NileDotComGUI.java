@@ -6,6 +6,13 @@ import java.util.ArrayList;
 
 
 public class NileDotComGUI {
+
+static String itemId;
+static String description;
+static double price;
+static int qty;
+static double discountRate;
+static double lineSubtotal;
     
 static ArrayList<String> cart = new ArrayList<>();
 static int itemCount = 0;
