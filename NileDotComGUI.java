@@ -85,9 +85,8 @@ searchButton.addActionListener(e -> {
                 }
 
                double discountRate = getDiscountRate(searchQty);
-                        double discountPercent = discountRate * 100.0;
-
-                        double lineSubtotal = searchQty * price * (1.0 - discountRate);
+                       double discountRate = getDiscountRate(requestedQty);
+double lineSubtotal = requestedQty * price * (1.0 - discountRate);
 
                         JOptionPane.showMessageDialog(frame,
                                 "Item Found!\n" +
@@ -99,6 +98,17 @@ searchButton.addActionListener(e -> {
                                         "Line Subtotal: $" + String.format("%.2f", lineSubtotal),
                                 "Nile Dot Com",
                                 JOptionPane.INFORMATION_MESSAGE);
+
+
+NileDotComGUI.discountRate = getDiscountRate(requestedQty);
+NileDotComGUI.lineSubtotal = NileDotComGUI.qty * NileDotComGUI.price * (1.0 - NileDotComGUI.discountRate);
+//  SAVE into class variables so Add button uses the right values
+NileDotComGUI.itemId = itemId;
+NileDotComGUI.description = description;
+NileDotComGUI.price = price;
+NileDotComGUI.qty = searchQty;
+NileDotComGUI.discountRate = discountRate;
+NileDotComGUI.lineSubtotal = lineSubtotal;
 
                 
                 addButton.setEnabled(true);
