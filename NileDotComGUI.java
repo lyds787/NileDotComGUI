@@ -100,6 +100,3 @@ searchButton.addActionListener(e -> {
         frame.setVisible(true);
     }
 }
-
-    }
-}
