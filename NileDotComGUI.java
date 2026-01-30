@@ -19,42 +19,76 @@ public class NileDotComGUI {
 
         JButton searchButton = new JButton("Search");
 
-        searchButton.addActionListener(e -> {
-            String id = idField.getText().trim();
 
-            try {
-                boolean found = false;
+searchButton.addActionListener(e -> {
+    String id = idField.getText().trim();
+    int qty;
 
-                for (String line : Files.readAllLines(Paths.get("inventory.csv"))) {
-                    String[] parts = line.split(",");
+    try {
+        qty = Integer.parseInt(qtyField.getText().trim());
+    } catch (NumberFormatException ex) {
+        JOptionPane.showMessageDialog(frame,
+                "Quantity must be a number",
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+        return;
+    }
 
-                    String itemId = parts[0].trim();
-                    String description = parts[1];
-                    double price = Double.parseDouble(parts[4]);
+    try {
+        boolean found = false;
 
-                    if (itemId.equals(id)) {
-                        found = true;
-                        JOptionPane.showMessageDialog(frame,
-                                "Item Found:\n" +
-                                description + "\nPrice: $" + price);
-                        break;
-                    }
-                }
+        for (String line : Files.readAllLines(Paths.get("inventory.csv"))) {
+            String[] parts = line.split(",");
 
-                if (!found) {
+            String itemId = parts[0].trim();
+            String description = parts[1].replace("\"", "");
+            boolean inStock = Boolean.parseBoolean(parts[2]);
+            int stockQty = Integer.parseInt(parts[3]);
+            double price = Double.parseDouble(parts[4]);
+
+            if (itemId.equals(id)) {
+                found = true;
+
+                if (!inStock) {
                     JOptionPane.showMessageDialog(frame,
-                            "Item ID " + id + " not found",
+                            "Sorry, this item is out of stock",
                             "Error",
                             JOptionPane.ERROR_MESSAGE);
+                    return;
                 }
 
-            } catch (IOException ex) {
+                if (qty > stockQty) {
+                    JOptionPane.showMessageDialog(frame,
+                            "Only " + stockQty + " items available",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
                 JOptionPane.showMessageDialog(frame,
-                        "Could not read inventory.csv",
-                        "File Error",
-                        JOptionPane.ERROR_MESSAGE);
+                        "Item Found:\n" +
+                        description +
+                        "\nPrice: $" + price +
+                        "\nQuantity Requested: " + qty);
+                return;
             }
-        });
+        }
+
+        if (!found) {
+            JOptionPane.showMessageDialog(frame,
+                    "Item ID " + id + " not found",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+
+    } catch (IOException ex) {
+        JOptionPane.showMessageDialog(frame,
+                "Could not read inventory.csv",
+                "File Error",
+                JOptionPane.ERROR_MESSAGE);
+    }
+});
+
 
         frame.setLayout(new FlowLayout());
         frame.add(idLabel);
