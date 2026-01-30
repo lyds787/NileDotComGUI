@@ -4,20 +4,22 @@ import java.io.*;
 import java.nio.file.*;
 import java.util.ArrayList;
 
-
 public class NileDotComGUI {
 
-static String itemId;
-static String description;
-static double price;
-static int qty;
-static double discountRate;
-static double lineSubtotal;
-    
-static ArrayList<String> cart = new ArrayList<>();
-static int itemCount = 0;
-static double orderSubtotal = 0.0;
+    // Cart storage
+    static ArrayList<String> cart = new ArrayList<>();
+    static ArrayList<Double> cartTotals = new ArrayList<>();
 
+    static int itemCount = 0;
+    static double orderSubtotal = 0.0;
+
+    // Remember the last searched valid item
+    static String itemId = null;
+    static String description = null;
+    static double price = 0.0;
+    static int qty = 0;
+    static double discountRate = 0.0;
+    static double lineSubtotal = 0.0;
 
     public static void main(String[] args) {
 
@@ -36,7 +38,7 @@ static double orderSubtotal = 0.0;
         JButton addButton = new JButton("Add To Cart");
 addButton.setEnabled(false);
 
-
+//////////////////////////////////////////////////////////////////////////////
 searchButton.addActionListener(e -> {
     String id = idField.getText().trim();
     int qty;
@@ -82,21 +84,22 @@ searchButton.addActionListener(e -> {
                     return;
                 }
 
-                double discountRate = getDiscountRate(qty);
-double discountPercent = discountRate * 100.0;
+               double discountRate = getDiscountRate(searchQty);
+                        double discountPercent = discountRate * 100.0;
 
-double lineSubtotal = qty * price * (1.0 - discountRate);
+                        double lineSubtotal = searchQty * price * (1.0 - discountRate);
 
-JOptionPane.showMessageDialog(frame,
-        "Item Found!\n" +
-        "ID: " + itemId + "\n" +
-        "Desc: " + description + "\n" +
-        "Price: $" + price + "\n" +
-        "Requested Qty: " + qty + "\n" +
-        "Discount: " + (int)discountPercent + "%\n" +
-        "Line Subtotal: $" + String.format("%.2f", lineSubtotal),
-        "Nile Dot Com",
-        JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.showMessageDialog(frame,
+                                "Item Found!\n" +
+                                        "ID: " + itemId + "\n" +
+                                        "Desc: " + description + "\n" +
+                                        "Price: $" + price + "\n" +
+                                        "Requested Qty: " + searchQty + "\n" +
+                                        "Discount: " + (int)discountPercent + "%\n" +
+                                        "Line Subtotal: $" + String.format("%.2f", lineSubtotal),
+                                "Nile Dot Com",
+                                JOptionPane.INFORMATION_MESSAGE);
+
                 
                 addButton.setEnabled(true);
 return;
@@ -118,31 +121,41 @@ return;
                 JOptionPane.ERROR_MESSAGE);
     }
 });
+//////////////////////////////////////////////////////////////////
 
-        addButton.addActionListener(e -> {
+addButton.addActionListener(e2 -> {
 
-    if (itemCount == 5) {
+    // 1) Must have searched a valid item first
+    if (lastItemId == null) {
         JOptionPane.showMessageDialog(frame,
-                "Cart is full (5 items max)",
+                "Search for an item first.",
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
         return;
     }
 
-    double discountRate = getDiscountRate(qty);
-    double lineSubtotal = qty * price * (1.0 - discountRate);
+    // 2) Max 5 items
+    if (itemCount >= 5) {
+        JOptionPane.showMessageDialog(frame,
+                "Cart is full (5 items max).",
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+        addButton.setEnabled(false);
+        return;
+    }
 
+    // 3) Add to cart
     itemCount++;
-    orderSubtotal += lineSubtotal;
+    orderSubtotal += lastLineSubtotal;
 
     String cartLine =
             itemCount + ". " +
-            itemId + " | " +
-            description + " | " +
-            "Qty: " + qty + " | " +
-            "Price: $" + price + " | " +
-            "Disc: " + (int)(discountRate * 100) + "% | " +
-            "Total: $" + String.format("%.2f", lineSubtotal);
+            lastItemId + " | " +
+            lastDescription + " | " +
+            "Qty: " + lastQty + " | " +
+            "Price: $" + String.format("%.2f", lastPrice) + " | " +
+            "Disc: " + (int)(lastDiscountRate * 100) + "% | " +
+            "Total: $" + String.format("%.2f", lastLineSubtotal);
 
     cart.add(cartLine);
 
@@ -150,6 +163,8 @@ return;
             "Item added to cart.\nCurrent subtotal: $" +
             String.format("%.2f", orderSubtotal));
 
+    // 4) Reset so they must search again before adding another
+    lastItemId = null;
     addButton.setEnabled(false);
 });
 
