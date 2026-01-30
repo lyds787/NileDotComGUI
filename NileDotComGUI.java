@@ -33,6 +33,9 @@ public class NileDotComGUI {
 
         JLabel qtyLabel = new JLabel("Quantity:");
         JTextField qtyField = new JTextField(15);
+        
+        //JLabel qtyLabel = new JLabel("Details");
+        //JTextField qtyField = new JTextField(15);
 
         JButton searchButton = new JButton("Search");
 
