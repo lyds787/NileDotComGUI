@@ -65,12 +65,23 @@ searchButton.addActionListener(e -> {
                     return;
                 }
 
-                JOptionPane.showMessageDialog(frame,
-                        "Item Found:\n" +
-                        description +
-                        "\nPrice: $" + price +
-                        "\nQuantity Requested: " + qty);
-                return;
+                double discountRate = getDiscountRate(qty);
+double discountPercent = discountRate * 100.0;
+
+double lineSubtotal = qty * price * (1.0 - discountRate);
+
+JOptionPane.showMessageDialog(frame,
+        "Item Found!\n" +
+        "ID: " + itemId + "\n" +
+        "Desc: " + description + "\n" +
+        "Price: $" + price + "\n" +
+        "Requested Qty: " + qty + "\n" +
+        "Discount: " + (int)discountPercent + "%\n" +
+        "Line Subtotal: $" + String.format("%.2f", lineSubtotal),
+        "Nile Dot Com",
+        JOptionPane.INFORMATION_MESSAGE);
+return;
+
             }
         }
 
@@ -99,4 +110,11 @@ searchButton.addActionListener(e -> {
 
         frame.setVisible(true);
     }
+    private static double getDiscountRate(int qty) {
+    if (qty >= 15) return 0.20;
+    if (qty >= 10) return 0.15;
+    if (qty >= 5) return 0.10;
+    return 0.0;
+}
+
 }
