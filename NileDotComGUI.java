@@ -42,6 +42,9 @@ cartArea.setEditable(false);
 JScrollPane cartScroll = new JScrollPane(cartArea);
         JButton deleteButton = new JButton("Delete Last Item");
 deleteButton.setEnabled(false);
+        JButton checkoutButton = new JButton("Check Out");
+checkoutButton.setEnabled(false);
+
 
 
 addButton.setEnabled(false);
@@ -213,6 +216,65 @@ itemCount = cart.size();
         deleteButton.setEnabled(false);
     }
 });
+        /////////////////////////////////////////////////////////////
+
+checkoutButton.addActionListener(e -> {
+
+    if (cart.isEmpty()) {
+        return;
+    }
+
+    double taxRate = 0.06;
+    double taxAmount = orderSubtotal * taxRate;
+    double finalTotal = orderSubtotal + taxAmount;
+
+    StringBuilder invoice = new StringBuilder();
+    invoice.append("Nile Dot Com - Final Invoice\n\n");
+
+    for (String line : cart) {
+        invoice.append(line).append("\n");
+    }
+
+    invoice.append("\n----------------------------\n");
+    invoice.append(String.format("Subtotal: $%.2f\n", orderSubtotal));
+    invoice.append(String.format("Tax (6%%): $%.2f\n", taxAmount));
+    invoice.append(String.format("FINAL TOTAL: $%.2f\n", finalTotal));
+    invoice.append("\n\nThank you for shopping at Nile Dot Com!");
+
+    JOptionPane.showMessageDialog(frame,
+            invoice.toString(),
+            "Final Invoice",
+            JOptionPane.INFORMATION_MESSAGE);
+
+    // ===== WRITE TO transactions.csv =====
+    try (PrintWriter out = new PrintWriter(new FileWriter("transactions.csv", true))) {
+
+        String transactionId =
+                java.time.LocalDateTime.now()
+                        .format(java.time.format.DateTimeFormatter.ofPattern("ddMMyyyyHHmmss"));
+
+        String timestamp =
+                java.time.LocalDateTime.now()
+                        .format(java.time.format.DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss"));
+
+        for (String line : cart) {
+            out.println(transactionId + "," + timestamp + "," + line);
+        }
+
+    } catch (IOException ex) {
+        JOptionPane.showMessageDialog(frame,
+                "Error writing transactions.csv",
+                "File Error",
+                JOptionPane.ERROR_MESSAGE);
+    }
+
+    // ===== LOCK THE APP AFTER CHECKOUT =====
+    searchButton.setEnabled(false);
+    addButton.setEnabled(false);
+    deleteButton.setEnabled(false);
+    checkoutButton.setEnabled(false);
+});
+
 
 
 
@@ -226,6 +288,8 @@ itemCount = cart.size();
         frame.add(addButton);
         frame.add(cartScroll);
         frame.add(deleteButton);
+        frame.add(checkoutButton);
+
 
 
 
