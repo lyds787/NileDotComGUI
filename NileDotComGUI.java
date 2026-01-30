@@ -10,6 +10,7 @@ public class NileDotComGUI {
     static ArrayList<String> cart = new ArrayList<>();
     static ArrayList<Double> cartTotals = new ArrayList<>();
 
+
     static int itemCount = 0;
     static double orderSubtotal = 0.0;
 
@@ -36,6 +37,13 @@ public class NileDotComGUI {
         JButton searchButton = new JButton("Search");
         
         JButton addButton = new JButton("Add To Cart");
+        JTextArea cartArea = new JTextArea(8, 55);
+cartArea.setEditable(false);
+JScrollPane cartScroll = new JScrollPane(cartArea);
+        JButton deleteButton = new JButton("Delete Last Item");
+deleteButton.setEnabled(false);
+
+
 addButton.setEnabled(false);
 
 //////////////////////////////////////////////////////////////////////////////
@@ -155,7 +163,9 @@ addButton.addActionListener(e2 -> {
     }
 
     // 3) Add to cart
-    itemCount++;
+  itemCount = cart.size() + 1;
+itemCount = cart.size();
+
     orderSubtotal += lastLineSubtotal;
 
     String cartLine =
@@ -167,7 +177,8 @@ addButton.addActionListener(e2 -> {
             "Disc: " + (int)(lastDiscountRate * 100) + "% | " +
             "Total: $" + String.format("%.2f", lastLineSubtotal);
 
-    cart.add(cartLine);
+    cartArea.append(cartLine + "\n");
+
 
     JOptionPane.showMessageDialog(frame,
             "Item added to cart.\nCurrent subtotal: $" +
@@ -177,6 +188,32 @@ addButton.addActionListener(e2 -> {
     lastItemId = null;
     addButton.setEnabled(false);
 });
+        //////////////////////////////////////////////////////////////////////////
+        deleteButton.addActionListener(e -> {
+    if (cart.isEmpty()) return;
+
+    // subtract last subtotal
+    double last = cartTotals.remove(cartTotals.size() - 1);
+    orderSubtotal -= last;
+
+    // remove last cart line
+    cart.remove(cart.size() - 1);
+    itemCount--;
+
+    // rebuild cartArea text from scratch (easy + reliable)
+    cartArea.setText("");
+    for (String line : cart) {
+        cartArea.append(line + "\n");
+    }
+
+    JOptionPane.showMessageDialog(frame,
+            "Last item deleted.\nCurrent subtotal: $" + String.format("%.2f", orderSubtotal));
+
+    if (cart.isEmpty()) {
+        deleteButton.setEnabled(false);
+    }
+});
+
 
 
 
@@ -187,6 +224,11 @@ addButton.addActionListener(e2 -> {
         frame.add(qtyField);
         frame.add(searchButton);
         frame.add(addButton);
+        frame.add(cartScroll);
+        frame.add(deleteButton);
+
+
+
 
         frame.setVisible(true);
     }
