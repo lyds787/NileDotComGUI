@@ -37,6 +37,13 @@ public class NileDotComGUI {
         //JLabel qtyLabel = new JLabel("Details");
         //JTextField qtyField = new JTextField(15);
 
+         JLabel detailsLabel = new JLabel("Item Details:");
+        JTextArea detailsArea = new JTextArea(4, 55);
+        detailsArea.setEditable(false);
+        detailsArea.setLineWrap(true);
+        detailsArea.setWrapStyleWord(true);
+        JScrollPane detailsScroll = new JScrollPane(detailsArea);
+
         JButton searchButton = new JButton("Search");
 
         JButton addButton = new JButton("Add To Cart");
@@ -289,6 +296,8 @@ public class NileDotComGUI {
         frame.add(deleteButton);
         frame.add(checkoutButton);
         frame.add(cartScroll);
+        frame.add(detailsLabel);
+        frame.add(detailsScroll);
 
         frame.setVisible(true);
     }
