@@ -1,3 +1,8 @@
+/* Name: Lydianne A. Rivera Cordero
+Course: CNT 4714 – Spring 2026
+Assignment title: Project 1 – An Event-driven Enterprise Simulation
+Date: Sunday February 1, 2026
+*/
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
@@ -20,6 +25,8 @@ public class NileDotComGUI {
     static int qty = 0;
     static double discountRate = 0.0;
     static double lineSubtotal = 0.0;
+    static int currentItemNumber = 1;
+
 
     public static void main(String[] args) {
 
@@ -29,20 +36,33 @@ public class NileDotComGUI {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JLabel idLabel = new JLabel("Item ID:");
-        JTextField idField = new JTextField(15);
+        JTextField idField = new JTextField(30);
 
         JLabel qtyLabel = new JLabel("Quantity:");
-        JTextField qtyField = new JTextField(15);
-        
-        //JLabel qtyLabel = new JLabel("Details");
-        //JTextField qtyField = new JTextField(15);
+        JTextField qtyField = new JTextField(30);
 
-         JLabel detailsLabel = new JLabel("Item Details:");
+        JLabel detailsLabel = new JLabel("Item Details:");
+        JTextArea detailArea = new JTextArea(1, 30);
+        detailArea.setEditable(false);
+        JScrollPane detailScroll = new JScrollPane(detailArea);
+
+        JLabel subtotalLabel = new JLabel("Current Subtotal for 0 item(s):");
+        JTextField subtotalField = new JTextField(30);
+        subtotalField.setEditable(false);
+        subtotalField.setText(String.format("$%.2f", orderSubtotal));
+
+
+/*
+        JLabel detailsLabel = new JLabel("Item Details:");
         JTextArea detailsArea = new JTextArea(4, 55);
         detailsArea.setEditable(false);
         detailsArea.setLineWrap(true);
         detailsArea.setWrapStyleWord(true);
         JScrollPane detailsScroll = new JScrollPane(detailsArea);
+*/
+
+        //JLabel qtyLabel = new JLabel("Details:");
+        //        JTextField qtyField = new JTextField(15);
 
         JButton searchButton = new JButton("Search");
 
@@ -55,13 +75,23 @@ public class NileDotComGUI {
         JButton checkoutButton = new JButton("Check Out");
         checkoutButton.setEnabled(false);
 
+        JButton newOrderButton = new JButton("New Order");
+        newOrderButton.setEnabled(false);
+
+        JButton exitButton = new JButton("Exit");
+
+
 
         JTextArea cartArea = new JTextArea(8, 55);
         cartArea.setEditable(false);
         JScrollPane cartScroll = new JScrollPane(cartArea);
 
+        setUiForItemNumber(currentItemNumber, idLabel, qtyLabel, detailsLabel,
+                searchButton, addButton, idField, qtyField);
 
-///  //////////////////////////SEARCH/////////////////////////
+
+
+/////////////////////////////SEARCH/////////////////////////
         searchButton.addActionListener(e -> {
             String id = idField.getText().trim();
 
@@ -119,7 +149,7 @@ public class NileDotComGUI {
                         double discountPercent = discountRate * 100.0;
 
                         double lineSubtotal = searchQty * price * (1.0 - discountRate);
-
+/*
                         JOptionPane.showMessageDialog(frame,
                                 "Item Found!\n" +
                                         "ID: " + itemId + "\n" +
@@ -130,6 +160,19 @@ public class NileDotComGUI {
                                         "Line Subtotal: $" + String.format("%.2f", lineSubtotal),
                                 "Nile Dot Com",
                                 JOptionPane.INFORMATION_MESSAGE);
+*/
+                        detailArea.setText(
+                                itemId + " " + description + " " + "$" +String.format("%.2f", price)+ " " + searchQty+ " " + (int)(discountPercent)+ "% " + " $" + String.format("%.2f", lineSubtotal)
+
+                                //"Item Found!\n" +
+                                      //  "ID: " + itemId + "\n" +
+                                        //"Desc: " + description + "\n" +
+                                       // "Price: $" + String.format("%.2f", price) + "\n" +
+                                       // "Requested Qty: " + searchQty + "\n" +
+                                       // "Discount: " + (int)(discountPercent) + "%\n" +
+                                       // "Line Subtotal: $" + String.format("%.2f", lineSubtotal)
+
+                        );
 
                         // SAVE into class variables so Add button uses the right values
                         NileDotComGUI.itemId = itemId;
@@ -160,10 +203,10 @@ public class NileDotComGUI {
                         JOptionPane.ERROR_MESSAGE);
             }
         });
-/// //////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
         addButton.addActionListener(e -> {
 
-            if (itemCount == 5) { // since it starts counting at 0 will probably have to change this to 4
+            if (cart.size() >= 5) { // since it starts counting at 0 will probably have to change this to 4
                 JOptionPane.showMessageDialog(frame,
                         "Cart is full (5 items max)",
                         "Error",
@@ -172,12 +215,16 @@ public class NileDotComGUI {
             }
 
             itemCount = cart.size() + 1;
-            itemCount = cart.size();
+
 
             orderSubtotal += lineSubtotal;
 
+            subtotalField.setText(String.format("$%.2f", orderSubtotal));
+            subtotalLabel.setText("Current Subtotal for " + (cart.size() + 1) + " item(s):");
+
+
             String cartLine =
-                    itemCount + ". " +
+                    "Item " + itemCount + ". " +
                             itemId + " | " +
                             description + " | " +
                             "Qty: " + qty + " | " +
@@ -194,11 +241,21 @@ public class NileDotComGUI {
 
             checkoutButton.setEnabled(true);
 
-            JOptionPane.showMessageDialog(frame,
+            /*JOptionPane.showMessageDialog(frame,
                     "Item added to cart.\nCurrent subtotal: $" +
                             String.format("%.2f", orderSubtotal));
+                            */
+            subtotalField.setText(String.format("$%.2f", orderSubtotal));
+            subtotalLabel.setText("Current Subtotal for " + cart.size() + " item(s):");
+
 
             addButton.setEnabled(false);
+
+            currentItemNumber++;  // go to next item number
+
+            setUiForItemNumber(currentItemNumber, idLabel, qtyLabel, detailsLabel,
+                    searchButton, addButton, idField, qtyField);
+
         });
 ////////////////////////////////////////////////////////
         deleteButton.addActionListener(e -> {
@@ -207,6 +264,10 @@ public class NileDotComGUI {
             // subtract last subtotal
             double last = cartTotals.remove(cartTotals.size() - 1);
             orderSubtotal -= last;
+
+            subtotalField.setText(String.format("$%.2f", orderSubtotal));
+            subtotalLabel.setText("Current Subtotal for " + cart.size() + " item(s):");
+
 
             // remove last cart line
             cart.remove(cart.size() - 1);
@@ -226,7 +287,7 @@ public class NileDotComGUI {
                 deleteButton.setEnabled(false);
             }
         });
-///////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////
         checkoutButton.addActionListener(e -> {
 
             if (cart.isEmpty()) {
@@ -279,33 +340,177 @@ public class NileDotComGUI {
             }
 
             // ===== LOCK THE APP AFTER CHECKOUT =====
+            /*
             searchButton.setEnabled(false);
             addButton.setEnabled(false);
             deleteButton.setEnabled(false);
             checkoutButton.setEnabled(false);
+*/
+
+            // Lock inputs
+            idField.setEditable(false);
+            qtyField.setEditable(false);
+
+// Disable buttons (order completed)
+            searchButton.setEnabled(false);   // Find Item / Search
+            addButton.setEnabled(false);
+            deleteButton.setEnabled(false);
+            checkoutButton.setEnabled(false);
+
+// Enable post-checkout actions
+            newOrderButton.setEnabled(true);
+            exitButton.setEnabled(true);
+
+
+
+        });
+//////////////////////////////////////////////////////////////////
+        exitButton.addActionListener(e -> System.exit(0));
+/// ///////////////////////////////////////////////////////////////
+        newOrderButton.addActionListener(e -> {
+
+            // Clear data structures
+            cart.clear();
+            cartTotals.clear();
+            itemCount = 0;
+            orderSubtotal = 0.0;
+
+            subtotalField.setText(String.format("$%.2f", orderSubtotal));
+            subtotalLabel.setText("Current Subtotal for 0 item(s):");
+
+
+            // Clear UI fields
+            idField.setText("");
+            qtyField.setText("");
+            detailArea.setText("");     // if you use JTextArea
+            // detailArea.setText("");  // if it's JTextField, same line works
+
+            cartArea.setText("");       // clears cart display
+
+            // Reset saved item
+            NileDotComGUI.itemId = null;
+            NileDotComGUI.description = null;
+            NileDotComGUI.price = 0.0;
+            NileDotComGUI.qty = 0;
+            NileDotComGUI.discountRate = 0.0;
+            NileDotComGUI.lineSubtotal = 0.0;
+
+            // Unlock inputs
+            idField.setEditable(true);
+            qtyField.setEditable(true);
+
+            // Reset buttons for a fresh order
+            searchButton.setEnabled(true);
+            addButton.setEnabled(false);
+            deleteButton.setEnabled(false);
+            checkoutButton.setEnabled(false);
+
+            // Disable new order until next checkout
+            newOrderButton.setEnabled(false);
+
+            currentItemNumber = 1;
+
+            setUiForItemNumber(currentItemNumber, idLabel, qtyLabel, detailsLabel,
+                    searchButton, addButton, idField, qtyField);
+
         });
 
 
-        frame.setLayout(new FlowLayout());
-        frame.add(idLabel);
-        frame.add(idField);
-        frame.add(qtyLabel);
-        frame.add(qtyField);
-        frame.add(searchButton);
-        frame.add(addButton);
-        frame.add(deleteButton);
-        frame.add(checkoutButton);
-        frame.add(cartScroll);
-        frame.add(detailsLabel);
-        frame.add(detailsScroll);
 
+
+// Use vertical stacking for rows
+        frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
+
+// Row 1: ID
+        JPanel row1 = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        row1.add(idLabel);
+        row1.add(idField);
+
+// Row 2: Quantity
+        JPanel row2 = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        row2.add(qtyLabel);
+        row2.add(qtyField);
+
+// Row 3: Details
+        JPanel row3 = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        row3.add(detailsLabel);
+        row3.add(detailScroll);
+
+        JPanel rowSub = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        rowSub.add(subtotalLabel);
+        rowSub.add(subtotalField);
+
+
+// Row 4: Buttons
+        JPanel row4 = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        row4.add(searchButton);
+        row4.add(addButton);
+        row4.add(deleteButton);
+        row4.add(checkoutButton);
+        row4.add(newOrderButton);
+        row4.add(exitButton);
+
+
+// Row 5: Cart
+        JPanel row5 = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        cartScroll.setPreferredSize(new Dimension(800, 220));
+        row5.add(cartScroll);
+
+// Align rows to the left (important for BoxLayout)
+        row1.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        row2.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        row3.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        row4.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        row5.setAlignmentX(Component.RIGHT_ALIGNMENT);
+
+// Add rows with controlled spacing
+        frame.add(row1);
+        frame.add(Box.createVerticalStrut(6));
+        frame.add(row2);
+        frame.add(Box.createVerticalStrut(6));
+        frame.add(row3);
+        frame.add(Box.createVerticalStrut(6));
+        frame.add(rowSub);
+        frame.add(Box.createVerticalStrut(10));
+        frame.add(row4);
+        frame.add(Box.createVerticalStrut(10));
+        frame.add(row5);
+
+
+
+// Better sizing behavior
+        frame.pack();
+        frame.setSize(950, 600);           // optional: keeps it from being tiny
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+
+
     }
     private static double getDiscountRate(int qty) {
         if (qty >= 15) return 0.20;
         if (qty >= 10) return 0.15;
         if (qty >= 5) return 0.10;
         return 0.0;
+    }
+    private static void setUiForItemNumber(
+            int itemNum,
+            JLabel idLabel, JLabel qtyLabel, JLabel detailsLabel,
+            JButton searchButton, JButton addButton,
+            JTextField idField, JTextField qtyField
+    ) {
+        idLabel.setText("Enter item ID for Item #" + itemNum + ":");
+        qtyLabel.setText("Enter quantity for Item #" + itemNum + ":");
+
+        // Details shows the previous item number (like the screenshot)
+        detailsLabel.setText("Details for Item #" + (itemNum - 1) + ":");
+
+        searchButton.setText("Search For Item #" + itemNum);
+        addButton.setText("Add Item #" + itemNum + " To Cart");
+
+        // Clear inputs for the next item
+        idField.setText("");
+        qtyField.setText("");
+        idField.requestFocus();
     }
 
 }
